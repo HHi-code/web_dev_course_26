@@ -11,21 +11,26 @@
 
 class Logger
   # TODO: Make the constructor private using private_class_method
+  private_class_method :new
   # TODO: Create a class variable @@instance
+  @@instance = nil
   # TODO: Implement self.instance method that returns the single instance
-  
+  def self.instance
+    @@instance = @@instance || new
+  end
+
   def initialize
     @logs = []
   end
-  
+
   def log(message)
     @logs << "[#{Time.now}] #{message}"
   end
-  
+
   def show_logs
     @logs
   end
-  
+
   def clear_logs
     @logs.clear
   end
@@ -39,15 +44,16 @@ require 'singleton'
 
 class Configuration
   # TODO: Include the Singleton module
-  
+  include Singleton
+
   attr_accessor :app_name, :version, :debug_mode
-  
+
   def initialize
     @app_name = "MyApp"
     @version = "1.0.0"
     @debug_mode = false
   end
-  
+
   def settings
     {
       app_name: @app_name,
@@ -62,33 +68,42 @@ end
 
 class DatabaseConnection
   # TODO: Implement Singleton pattern (manually or with module)
+  include Singleton
   # TODO: Add a @connected attribute to track connection state
-  
+
   def initialize
     @connected = false
     @connection_string = nil
   end
-  
+
   def connect(connection_string)
     # TODO: Set @connected to true and save connection_string
+    @connected = true
+    @connection_string = connection_string
     # TODO: Return "Connected to #{connection_string}"
-    nil
+    "Connected to #{connection_string}"
   end
-  
+
   def disconnect
     # TODO: Set @connected to false
+    @connected = false
+    @connection_string = nil
     # TODO: Return "Disconnected"
-    nil
+    "Disconnected"
   end
-  
+
   def connected?
     @connected
   end
-  
+
   def execute_query(query)
     # TODO: Return "Executing: #{query}" if connected
     # TODO: Return "Not connected to database" if not connected
-    nil
+    if @connected
+      "Executing: #{query}"
+    else
+      "Not connected to database"
+    end
   end
 end
 
@@ -99,16 +114,16 @@ end
 def run_tests
   tests_passed = 0
   total_tests = 0
-  
+
   puts "Testing Singleton Pattern..."
   puts "=" * 40
-  
+
   # Test 1: Logger Singleton - same instance
   total_tests += 1
   begin
     logger1 = Logger.instance
     logger2 = Logger.instance
-    
+
     if logger1.object_id == logger2.object_id
       tests_passed += 1
       puts "✓ Test 1 passed: Logger returns same instance"
@@ -118,7 +133,7 @@ def run_tests
   rescue => e
     puts "✗ Test 1 failed: #{e.message}"
   end
-  
+
   # Test 2: Logger cannot be instantiated with new
   total_tests += 1
   begin
@@ -130,14 +145,14 @@ def run_tests
   rescue => e
     puts "✗ Test 2 failed: Wrong error - #{e.message}"
   end
-  
+
   # Test 3: Logger functionality
   total_tests += 1
   begin
     logger = Logger.instance
     logger.clear_logs
     logger.log("Test message")
-    
+
     if logger.show_logs.length == 1 && logger.show_logs[0].include?("Test message")
       tests_passed += 1
       puts "✓ Test 3 passed: Logger stores messages"
@@ -147,15 +162,15 @@ def run_tests
   rescue => e
     puts "✗ Test 3 failed: #{e.message}"
   end
-  
+
   # Test 4: Configuration Singleton
   total_tests += 1
   begin
     config1 = Configuration.instance
     config2 = Configuration.instance
-    
+
     config1.app_name = "TestApp"
-    
+
     if config2.app_name == "TestApp"
       tests_passed += 1
       puts "✓ Test 4 passed: Configuration shares state"
@@ -165,7 +180,7 @@ def run_tests
   rescue => e
     puts "✗ Test 4 failed: #{e.message}"
   end
-  
+
   # Test 5: Configuration cannot be instantiated with new
   total_tests += 1
   begin
@@ -177,13 +192,13 @@ def run_tests
   rescue => e
     puts "✗ Test 5 failed: Wrong error - #{e.message}"
   end
-  
+
   # Test 6: DatabaseConnection Singleton
   total_tests += 1
   begin
     db1 = DatabaseConnection.instance
     db2 = DatabaseConnection.instance
-    
+
     if db1.object_id == db2.object_id
       tests_passed += 1
       puts "✓ Test 6 passed: DatabaseConnection returns same instance"
@@ -193,13 +208,13 @@ def run_tests
   rescue => e
     puts "✗ Test 6 failed: #{e.message}"
   end
-  
+
   # Test 7: DatabaseConnection functionality
   total_tests += 1
   begin
     db = DatabaseConnection.instance
     result = db.connect("localhost:5432")
-    
+
     if db.connected? && result == "Connected to localhost:5432"
       tests_passed += 1
       puts "✓ Test 7 passed: DatabaseConnection connects"
@@ -209,14 +224,14 @@ def run_tests
   rescue => e
     puts "✗ Test 7 failed: #{e.message}"
   end
-  
+
   # Test 8: DatabaseConnection query execution
   total_tests += 1
   begin
     db = DatabaseConnection.instance
     db.connect("localhost:5432")
     result = db.execute_query("SELECT * FROM users")
-    
+
     if result == "Executing: SELECT * FROM users"
       tests_passed += 1
       puts "✓ Test 8 passed: DatabaseConnection executes queries"
@@ -226,7 +241,7 @@ def run_tests
   rescue => e
     puts "✗ Test 8 failed: #{e.message}"
   end
-  
+
   puts "\n" + "=" * 40
   if tests_passed == total_tests
     puts "🎉 All tests passed! (#{tests_passed}/#{total_tests})"

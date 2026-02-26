@@ -19,15 +19,15 @@ class CreditCardPayment < PaymentStrategy
   def initialize(card_number)
     @card_number = card_number
   end
-  
+
   # TODO: Implement pay method
   # Return "Paid $#{amount} using Credit Card ending in #{last_4_digits}"
   def pay(amount)
-    nil
+    "Paid $#{amount} using Credit Card ending in #{last_4_digits}"
   end
-  
+
   private
-  
+
   def last_4_digits
     @card_number[-4..-1]
   end
@@ -37,11 +37,11 @@ class PayPalPayment < PaymentStrategy
   def initialize(email)
     @email = email
   end
-  
+
   # TODO: Implement pay method
   # Return "Paid $#{amount} using PayPal account #{email}"
   def pay(amount)
-    nil
+    "Paid $#{amount} using PayPal account #{@email}"
   end
 end
 
@@ -49,11 +49,11 @@ class CryptoPayment < PaymentStrategy
   def initialize(wallet_address)
     @wallet_address = wallet_address
   end
-  
+
   # TODO: Implement pay method
   # Return "Paid $#{amount} using Crypto wallet #{wallet_address}"
   def pay(amount)
-    nil
+    "Paid $#{amount} using Crypto wallet #{@wallet_address}"
   end
 end
 
@@ -62,25 +62,25 @@ class ShoppingCart
     @items = []
     @payment_strategy = nil
   end
-  
+
   def add_item(name, price)
     @items << { name: name, price: price }
   end
-  
+
   # TODO: Implement set_payment_strategy method
   def set_payment_strategy(strategy)
-    nil
+    @payment_strategy = strategy
   end
-  
+
   def total
     @items.sum { |item| item[:price] }
   end
-  
+
   # TODO: Implement checkout method
   # Use the payment strategy to process payment
   # Return the result from payment strategy's pay method
   def checkout
-    nil
+    @payment_strategy.pay(total)
   end
 end
 
@@ -95,31 +95,46 @@ end
 
 class BubbleSort
   include SortStrategy
-  
+
   # TODO: Implement bubble sort
   # Return sorted array (ascending order)
   def sort(array)
-    nil
+    array_length = array.size
+  return array if array_length <= 1
+
+  loop do
+    swapped = false
+    (array_length-1).times do |i|
+      if array[i] > array[i+1]
+        array[i], array[i+1] = array[i+1], array[i]
+        swapped = true
+      end
+    end
+
+    break if not swapped
+  end
+
+  array
   end
 end
 
 class QuickSort
   include SortStrategy
-  
+
   # TODO: Implement quick sort or use Ruby's built-in sort
   # Return sorted array (ascending order)
   def sort(array)
-    nil
+    array.sort
   end
 end
 
 class ReverseSort
   include SortStrategy
-  
+
   # TODO: Implement reverse sort
   # Return sorted array (descending order)
   def sort(array)
-    nil
+    array.sort.reverse
   end
 end
 
@@ -127,16 +142,16 @@ class DataProcessor
   def initialize(sort_strategy)
     @sort_strategy = sort_strategy
   end
-  
+
   # TODO: Implement set_strategy method
   def set_strategy(strategy)
-    nil
+    @sort_strategy = strategy
   end
-  
+
   # TODO: Implement process method
   # Use the sort strategy to sort the data
   def process(data)
-    nil
+    @sort_strategy.sort(data)
   end
 end
 
@@ -153,7 +168,7 @@ class ZipCompression < CompressionStrategy
   # TODO: Implement compress method
   # Return "ZIP compressed: #{data}"
   def compress(data)
-    nil
+    "ZIP compressed: #{data}"
   end
 end
 
@@ -161,7 +176,7 @@ class RarCompression < CompressionStrategy
   # TODO: Implement compress method
   # Return "RAR compressed: #{data}"
   def compress(data)
-    nil
+    "RAR compressed: #{data}"
   end
 end
 
@@ -169,26 +184,26 @@ class NoCompression < CompressionStrategy
   # TODO: Implement compress method
   # Return "Not compressed: #{data}"
   def compress(data)
-    nil
+    "Not compressed: #{data}"
   end
 end
 
 class FileHandler
   attr_reader :compression_strategy
-  
+
   def initialize(compression_strategy = NoCompression.new)
     @compression_strategy = compression_strategy
   end
-  
+
   # TODO: Implement set_compression method
   def set_compression(strategy)
-    nil
+    @compression_strategy = strategy
   end
-  
+
   # TODO: Implement save_file method
   # Compress data using the strategy and return result
   def save_file(data)
-    nil
+    @compression_strategy.compress(data)
   end
 end
 
@@ -199,10 +214,10 @@ end
 def run_tests
   tests_passed = 0
   total_tests = 0
-  
+
   puts "Testing Strategy Pattern..."
   puts "=" * 40
-  
+
   # Test 1: Credit Card Payment
   total_tests += 1
   begin
@@ -211,7 +226,7 @@ def run_tests
     cart.add_item("Pen", 5)
     cart.set_payment_strategy(CreditCardPayment.new("1234567890123456"))
     result = cart.checkout
-    
+
     if result.include?("15") && result.include?("3456")
       tests_passed += 1
       puts "✓ Test 1 passed: Credit Card payment works"
@@ -221,7 +236,7 @@ def run_tests
   rescue => e
     puts "✗ Test 1 failed: #{e.message}"
   end
-  
+
   # Test 2: PayPal Payment
   total_tests += 1
   begin
@@ -229,7 +244,7 @@ def run_tests
     cart.add_item("Mouse", 25)
     cart.set_payment_strategy(PayPalPayment.new("user@example.com"))
     result = cart.checkout
-    
+
     if result.include?("25") && result.include?("user@example.com")
       tests_passed += 1
       puts "✓ Test 2 passed: PayPal payment works"
@@ -239,7 +254,7 @@ def run_tests
   rescue => e
     puts "✗ Test 2 failed: #{e.message}"
   end
-  
+
   # Test 3: Crypto Payment
   total_tests += 1
   begin
@@ -247,7 +262,7 @@ def run_tests
     cart.add_item("Keyboard", 50)
     cart.set_payment_strategy(CryptoPayment.new("0x1234abcd"))
     result = cart.checkout
-    
+
     if result.include?("50") && result.include?("0x1234abcd")
       tests_passed += 1
       puts "✓ Test 3 passed: Crypto payment works"
@@ -257,13 +272,13 @@ def run_tests
   rescue => e
     puts "✗ Test 3 failed: #{e.message}"
   end
-  
+
   # Test 4: Bubble Sort
   total_tests += 1
   begin
     processor = DataProcessor.new(BubbleSort.new)
     result = processor.process([3, 1, 4, 1, 5, 9, 2, 6])
-    
+
     if result == [1, 1, 2, 3, 4, 5, 6, 9]
       tests_passed += 1
       puts "✓ Test 4 passed: Bubble sort works"
@@ -273,13 +288,13 @@ def run_tests
   rescue => e
     puts "✗ Test 4 failed: #{e.message}"
   end
-  
+
   # Test 5: Quick Sort
   total_tests += 1
   begin
     processor = DataProcessor.new(QuickSort.new)
     result = processor.process([5, 2, 8, 1, 9])
-    
+
     if result == [1, 2, 5, 8, 9]
       tests_passed += 1
       puts "✓ Test 5 passed: Quick sort works"
@@ -289,13 +304,13 @@ def run_tests
   rescue => e
     puts "✗ Test 5 failed: #{e.message}"
   end
-  
+
   # Test 6: Reverse Sort
   total_tests += 1
   begin
     processor = DataProcessor.new(ReverseSort.new)
     result = processor.process([3, 1, 4, 1, 5])
-    
+
     if result == [5, 4, 3, 1, 1]
       tests_passed += 1
       puts "✓ Test 6 passed: Reverse sort works"
@@ -305,14 +320,14 @@ def run_tests
   rescue => e
     puts "✗ Test 6 failed: #{e.message}"
   end
-  
+
   # Test 7: Change sorting strategy
   total_tests += 1
   begin
     processor = DataProcessor.new(BubbleSort.new)
     processor.set_strategy(ReverseSort.new)
     result = processor.process([1, 2, 3])
-    
+
     if result == [3, 2, 1]
       tests_passed += 1
       puts "✓ Test 7 passed: Strategy change works"
@@ -322,14 +337,14 @@ def run_tests
   rescue => e
     puts "✗ Test 7 failed: #{e.message}"
   end
-  
+
   # Test 8: ZIP Compression
   total_tests += 1
   begin
     handler = FileHandler.new
     handler.set_compression(ZipCompression.new)
     result = handler.save_file("test data")
-    
+
     if result == "ZIP compressed: test data"
       tests_passed += 1
       puts "✓ Test 8 passed: ZIP compression works"
@@ -339,13 +354,13 @@ def run_tests
   rescue => e
     puts "✗ Test 8 failed: #{e.message}"
   end
-  
+
   # Test 9: RAR Compression
   total_tests += 1
   begin
     handler = FileHandler.new(RarCompression.new)
     result = handler.save_file("important file")
-    
+
     if result == "RAR compressed: important file"
       tests_passed += 1
       puts "✓ Test 9 passed: RAR compression works"
@@ -355,13 +370,13 @@ def run_tests
   rescue => e
     puts "✗ Test 9 failed: #{e.message}"
   end
-  
+
   # Test 10: No Compression
   total_tests += 1
   begin
     handler = FileHandler.new(NoCompression.new)
     result = handler.save_file("plain text")
-    
+
     if result == "Not compressed: plain text"
       tests_passed += 1
       puts "✓ Test 10 passed: No compression works"
@@ -371,7 +386,7 @@ def run_tests
   rescue => e
     puts "✗ Test 10 failed: #{e.message}"
   end
-  
+
   puts "\n" + "=" * 40
   if tests_passed == total_tests
     puts "🎉 All tests passed! (#{tests_passed}/#{total_tests})"
